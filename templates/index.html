@@ -20,13 +20,13 @@
 
     {% for item in my_list %}
         {% if loop.index==1 %}
-            <li style="background-color: red;">{{ loop.index }}--{{ item.get('value') }}</li>
+            <li style="background-color: white;">{{ loop.index }}--{{ item.get('value') }}</li>
         {% elif loop.index==2 %}
-            <li style="background-color: blue;">{{ loop.index }}--{{ item.get('value') }}</li>
+            <li style="background-color: white;">{{ loop.index }}--{{ item.get('value') }}</li>
         {% elif loop.index==3 %}
-            <li style="background-color: green;">{{ loop.index }}--{{ item.get('value') }}</li>
+            <li style="background-color: white;">{{ loop.index }}--{{ item.get('value') }}</li>
         {% else %}
-            <li style="background-color: yellow;">{{ loop.index }}--{{ item.get('value') }}</li>
+            <li style="background-color: white;">{{ loop.index }}--{{ item.get('value') }}</li>
         {% endif %}
     {% endfor %}
 
@@ -37,7 +37,7 @@
    <script>
        function ajaxTest(){
             $.httpRequestAsyncPost("/ajaxPost",
-  	    		{'username':'hsj123','password':'123456','remark':'测试ajax'},
+  	    		{'username':'hsj123','password':'123456','remark':'测试ajax','tokentest':'sddfkjgsdfqwegrfuwbf872365rrbfu'},
   	    		function(result){
   	    			console.log(result)
   	    		},
@@ -45,7 +45,7 @@
   	    			console.log(result);
   	    		});
             $.httpRequestAsyncGET("/mysqlOp",
-  	    		{'username':'hsj123','password':'123456','id':8},
+  	    		{'username':'hsj123','password':'123456','id':8,'tokentest':'sddfkjgsdfqwegrfuwbf872365rrbfu'},
   	    		function(result){
   	    			console.log(result)
   	    		},

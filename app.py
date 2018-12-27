@@ -12,11 +12,22 @@
 ssl 'module' object has no attribute 'SSLContext'
 则参考Stack Overflow：
 SSLContext was introduced in 2.7.9, you're using an old version of Python so it doesn't have this attribute.
+
+
+    # POST:
+    # request.form获得所有post参数放在一个类似dict类中,to_dict()是字典化
+    # 单个参数可以通过request.form.to_dict().get("xxx","")获得
+    # ----------------------------------------------------
+    # GET:
+    # request.args获得所有get参数放在一个类似dict类中,to_dict()是字典化
+    # 单个参数可以通过request.args.to_dict().get('xxx',"")获得
 '''
-from flask import Flask
+from flask import Flask,session
 from flask import render_template
 from flask import json
 from flask import jsonify
+from datetime import timedelta
+import os
 
 from flask import request
 from flask import make_response, Response
@@ -26,13 +37,56 @@ from responseWrap import  Response_headers,allow_cross_domain
 from mysqlOp import mysql
 
 app = Flask(__name__)
+app.config['SECRET_KEY']=os.urandom(24)   #设置为24位的字符,每次运行服务器都是不同的，所以服务器启动一次上次的session就清除。
+app.config['PERMANENT_SESSION_LIFETIME']=timedelta(days=7) #设置session的保存时间。#默认session的时间持续31天
 
+
+# 使用before_request来做权限
+@app.before_request
+def before_request():
+    ip = request.remote_addr
+    url = request.url
+    print u'获取ip地址%s' % (ip)
+    print u'获取url地址%s' % (url)
+    if request.method == 'GET':
+        print 'GET'
+        print request.args.to_dict()
+    else:
+        print 'POST'
+        print request.form.to_dict()
+
+
+@app.after_request
+def after_request():
+    print u'after_request-请求离开'
+
+#获取session
+@app.route('/get/session')
+def get():
+    return  session.get('username')
+
+#删除session
+@app.route('/delete/session')
+def delete():
+    print(session.get('username'))
+    session.pop('username')
+    print(session.get('username'))
+    return 'delete'
+#清楚session
+@app.route('/clear/session')
+def clear():
+    print(session.get('username'))
+    session.clear()
+    print(session.get('username'))
+    return 'clear'
 
 
 # restful-api
 @app.route('/')
 @allow_cross_domain
 def hello_world():
+    session.permanent=True
+    session['username'] = 'hsj'
     return Response(json.dumps({'a': 1, 'b': 1, 'c': u'JSON数据返回'}), content_type='application/json')
 
 
@@ -65,13 +119,6 @@ def index():
 @app.route('/ajaxPost', methods=['POST'])
 @allow_cross_domain
 def ajaxPost():
-     # POST:
-    # request.form获得所有post参数放在一个类似dict类中,to_dict()是字典化
-    # 单个参数可以通过request.form.to_dict().get("xxx","")获得
-    # ----------------------------------------------------
-    # GET:
-    # request.args获得所有get参数放在一个类似dict类中,to_dict()是字典化
-    # 单个参数可以通过request.args.to_dict().get('xxx',"")获得
     resp = Response_headers(request.form.to_dict())
     return resp
 
@@ -92,25 +139,25 @@ app.add_template_filter(do_listreverse, 'listreverse')
 
 @app.errorhandler(403)
 def page_not_found(error):
-    content = json.dumps({"error_code": "403"})
+    content = json.dumps({u"error_code": "403"})
     resp = Response_headers(content)
     return resp
 
 @app.errorhandler(404)
 def page_not_found(error):
-    content = json.dumps({"error_code": "404"})
+    content = json.dumps({u"error_code": "404"})
     resp = Response_headers(content)
     return resp
 
 @app.errorhandler(400)
 def page_not_found(error):
-     content = json.dumps({"error_code": "400"})
+     content = json.dumps({u"error_code": "400"})
      resp = Response_headers(content)
      return resp
 
 @app.errorhandler(500)
 def page_not_found(error):
-     content = json.dumps({"error_code": "500"})
+     content = json.dumps({u"error_code": "500"})
      resp = Response_headers(content)
      return resp
 

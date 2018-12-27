@@ -8,7 +8,9 @@
 @time: 2018/12/27 10:29
 @desc:f返回封装
 '''
-from flask import request
+from exceptions import Exception
+
+from flask import request,session
 from flask import make_response, Response
 from flask import json
 from flask import jsonify
@@ -24,6 +26,9 @@ def Response_headers(content):
 def allow_cross_domain(fun):
     @wraps(fun)
     def wrapper_fun(*args, **kwargs):
+        # print args #tuple
+        # print kwargs #dict-copy-just like c/c++
+        # print session.get('username')
         rst = make_response(fun(*args, **kwargs))
         rst.headers['Access-Control-Allow-Origin'] = '*'
         rst.headers['Access-Control-Allow-Methods'] = 'PUT,GET,POST,DELETE'
